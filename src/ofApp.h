@@ -3,6 +3,11 @@
 #include "ofMain.h"
 #include "moth.hpp"
 #include "target.hpp"
+#include "ofxOsc.h"
+
+#define RECEIVE_PORT 12345
+#define SEND_PORT 54321
+#define HOST "localhost"
 
 class ofApp : public ofBaseApp{
 
@@ -23,7 +28,8 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 		
-    
+    void addMoth();
+    int numMoths = 0;
     
     
     ofEasyCam camera;
@@ -32,4 +38,14 @@ class ofApp : public ofBaseApp{
    
     vector<Moth> moths;
     vector<Target> targets;
+    
+    ofxOscReceiver receiver;
+    float partials[20]; //incoming info about where the targets should end up
+    
+    
+    //for sending information about moths
+    ofxOscSender sender;
+    float mothX;
+    float mothY;
+    float mothZ;
 };

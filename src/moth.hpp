@@ -11,7 +11,7 @@
 class Moth{
 public:
     void setFavoriteNumber(int);
-    void setup(float, float, float);
+    void setup(int, float, float, float);
     void applyForce(const ofVec3f & force);
     void applyBehaviors(vector<Moth> moths, vector<Target> targets);
     void update();
@@ -29,8 +29,12 @@ public:
         return position;
     }
     
+    const int getId() const {
+        return id;
+    }
+    
 private:
-    int favoriteNumber;
+    int id;
     ofVec3f position;
     ofVec3f velocity;
     ofVec3f acceleration;

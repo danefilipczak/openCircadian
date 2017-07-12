@@ -5,7 +5,9 @@ void ofApp::setup(){
 
     
     
-    
+    receiver.setup(RECEIVE_PORT);
+    sender.setup(HOST, SEND_PORT);
+    ofSetFrameRate(60); //this supposedly will keep the OSC from bugging everything. Probably best to just keep the clock lower on SC however
     sphere.setResolution(5);
     //    light.setSpotlight();
     ofSetSmoothLighting(true);
@@ -17,10 +19,12 @@ void ofApp::setup(){
     moths.resize(500);
     targets.resize(10);
     
-    for (auto & m : moths){
-        //ofVec3f location(ofGetWidth(), ofGetHeight());
-        m.setup(ofRandom(ofGetWidth()), ofRandom(ofGetHeight()), ofRandom(ofGetHeight()));
-    }
+    addMoth();
+    
+//    for (auto & m : moths){
+//        //ofVec3f location(ofGetWidth(), ofGetHeight());
+//        m.setup(ofRandom(ofGetWidth()), ofRandom(ofGetHeight()), ofRandom(ofGetHeight()));
+//    }
     float y = 0;
     
     
@@ -47,14 +51,44 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    
+    while(receiver.hasWaitingMessages()){
+        
+        ofxOscMessage m;
+        receiver.getNextMessage(&m);
+        
+        if(m.getAddress()=="/noteOn"){
+            
+            for(int i = 0; i<20; i++){
+                partials[i] = m.getArgAsFloat(i);
+            };
+            
+        };
+        
+    };
 
     
     //    sphere.move(ofVec3f(0,0,-10));
+    addMoth();
+    
     
     for (auto & m : moths){
         m.applyBehaviors(moths, targets);
         m.update();
+        
+//        ofxOscMessage out;
+//        out.setAddress("moth");
+//        out.addIntArg(m.getId());
+//        
+//        out.addFloatArg(m.getPosition().x);
+//        out.addFloatArg(m.getPosition().y);
+//        out.addFloatArg(m.getPosition().z);
+        
+        
     }
+    
+    
+    
 }
 
 //--------------------------------------------------------------
@@ -102,6 +136,19 @@ void ofApp::keyPressed(int key){
         
     }
 
+}
+
+
+//------------------------------------------------------------
+
+void ofApp::addMoth(){
+    
+
+    Moth m;
+     m.setup(numMoths, ofRandom(ofGetWidth()), ofRandom(ofGetHeight()), ofRandom(ofGetHeight()));
+    moths.push_back(m);
+    numMoths++;
+    
 }
 
 //--------------------------------------------------------------

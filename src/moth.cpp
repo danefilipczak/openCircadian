@@ -11,8 +11,8 @@
 
 
 
-void Moth::setup(float x, float y, float z){
-    
+void Moth::setup(int _id, float x, float y, float z){
+    id = _id;
     position.set(x, y, z);
     r = 12;
     maxspeed = 20;
