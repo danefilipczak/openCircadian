@@ -33,7 +33,7 @@ public:
     void addForce(ofVec3f vec);
     void applyForce();
     void growMidpoint(Node neighbor);
-    void linkWith(Node neighbor);
+    void linkWith(Node* neighbor); //why did this not work when I tried to pass it a whole node object and post to it within the function, e.g. linkWith(Node neightbor);
     
     
     const ofPoint& getPosition() const {
@@ -43,7 +43,7 @@ public:
     
 private:
     bool dead = false;
-    vector<Node> linkedTo; //i'm not sure if this is going to work... needs to store a flexibly sized group of things that
+    vector<Node*> linkedTo; //i'm not sure if this is going to work... needs to store a flexibly sized group of things that
     int lifespan;
     int deathClock;
     float r;

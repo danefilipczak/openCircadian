@@ -29,7 +29,7 @@ void Node::setup(float x, float y, float z){
     material.setAmbientColor(ofColor(0));
 }
 
-void Node::linkWith(Node node){
+void Node::linkWith(Node* node){
     linkedTo.push_back(node);
 }
 
@@ -47,11 +47,17 @@ void Node::draw(){
     //sphere.drawWireframe();
     material.end();
     ofPopMatrix();
+    
     ofSetLineWidth(10);
     ofSetColor(255, 255, 70, 100);
     for(auto & n : linkedTo){
-        ofVec3f l = n.getPosition();
-        ofDrawLine(position.x, position.y, position.z, l.x, l.y, l.z);
+        //ofVec3f l = n->getPosition();
+        //cout << l;
+        //ofDrawLine(position.x, position.y, position.z, l.x, l.y, l.z);
+        ofDrawLine(position, n->getPosition());
+        //cout << n->getPosition();
+        
     };
+    
 
 }

@@ -27,8 +27,8 @@ void ofApp::setup(){
     for (auto & n : nodes){
         for (auto & nn : nodes){
             if(n.getPosition() != nn.getPosition()){
-                if(n.getPosition().distance(nn.getPosition())<icoR*1.2){
-                    nn.linkWith(n);
+                if(n.getPosition().distance(nn.getPosition())<icoR*1.5){
+                    nn.linkWith(&n); //why did this not work when I tried to link it with a full node ob?????
                 };
             };
         };
@@ -224,6 +224,8 @@ void ofApp::keyPressed(int key){
         y++;
         
     }
+    
+    moths.at(1);
 
 }
 
