@@ -3,16 +3,18 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     ofEnableAlphaBlending();
-    ofDisableArbTex();
+    //ofDisableArbTex();
+    ofSetGlobalAmbientColor(ofColor(255));
     
     //OSC boilerplate
     receiver.setup(RECEIVE_PORT);
     sender.setup(HOST, SEND_PORT);
     ofSetFrameRate(60); //this supposedly will keep the OSC from bugging everything. Probably best to just keep the clock lower on SC however
     
+    float icoR = 100;
     
     //give yourself an icosahedron
-    icosahedron = ofMesh::icosahedron(100);
+    icosahedron = ofMesh::icosahedron(icoR);
     
     vector<ofVec3f> verts = icosahedron.getVertices();
     
@@ -22,8 +24,33 @@ void ofApp::setup(){
         nodes.push_back(n);
     }
     
+    for (auto & n : nodes){
+        for (auto & nn : nodes){
+            if(n.getPosition() != nn.getPosition()){
+                if(n.getPosition().distance(nn.getPosition())<icoR*1.5){
+                    nn.linkWith(n);
+                };
+            };
+        };
+    };
     
-    tex.loadImage("iceland.jpg");
+//    for (var i = 0; i < nodes.length; i++) {
+//        for (var j = 0; j < nodes.length; j++) {
+//            if(i!==j){
+//                var iVec = new THREE.Vector3();
+//                iVec.copy(nodes[i].sphere.position);
+//                var jVec = new THREE.Vector3();
+//                jVec.copy(nodes[j].sphere.position);
+//                if(jVec.distanceTo(iVec)<geomThresh){
+//                    nodes[j].linkedTo.push(nodes[i]);
+//                    //nodes[i].linkedTo.push(nodes[j]);
+//                }
+//            }
+//        }
+//    }
+    
+    
+    //tex.loadImage("iceland.jpg");
     //tex.allocate(<#const ofTextureData &textureData#>)
     
     mothMaterial.setShininess(120);
@@ -89,6 +116,7 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
     
+    // OSC STUFF
     while(receiver.hasWaitingMessages()){
         
         ofxOscMessage m;
@@ -105,10 +133,8 @@ void ofApp::update(){
     };
 
     
-    //    sphere.move(ofVec3f(0,0,-10));
-    if(moths.size()<700){addMoth();};
-    
-    
+    //    MOTH STUFF
+    if(moths.size()<200){addMoth();};
     for (auto & m : moths){
         m.applyBehaviors(moths, targets);
         m.update();
@@ -120,9 +146,11 @@ void ofApp::update(){
 //        out.addFloatArg(m.getPosition().x);
 //        out.addFloatArg(m.getPosition().y);
 //        out.addFloatArg(m.getPosition().z);
-        
-        
     }
+    
+    
+    // NODE STUFF
+    
     
     
     
@@ -132,7 +160,7 @@ void ofApp::update(){
 void ofApp::draw(){
     
     //ofBackground(255, 255, 255);
-    ofBackground(250);
+    ofBackground(10);
     
     ofEnableDepthTest();
     
@@ -160,12 +188,12 @@ void ofApp::draw(){
     
     light.disable();
     //targetMaterial.begin();
-    tex.getTextureReference().bind();
-    ofSetColor(255, 255, 255, 150);
+    //tex.getTextureReference().bind();
+    ofSetColor(255, 255, 50, 100);
     for (auto & t : targets){
         t.draw();
     };
-    tex.getTextureReference().unbind();
+    //tex.getTextureReference().unbind();
     //targetMaterial.end();
    
     
@@ -192,6 +220,47 @@ void ofApp::keyPressed(int key){
 }
 
 
+//-----------------------------------------------------
+
+
+void ofApp::rejectAll(float rThresh, float rForce){
+    for(auto & i : nodes){
+        ofVec3f ip = i.getPosition();
+        for(auto & j : nodes){
+            ofVec3f jp = j.getPosition();
+            if(ip != jp){
+                if(ip.distance(jp)<rThresh){
+                    ofVec3f force = ip - jp;
+                    force.normalize();
+                    i.addForce(force *= rForce/nodes.size());
+                    j.addForce(-force *= rForce/nodes.size());
+                };
+            };
+        };
+    };
+};
+
+//function rejectAll(rThresh, rForce){
+//    for (var i = 0; i < nodes.length-1; i++) {
+//        for (var j = i+1; j < nodes.length; j++) {
+//            if(i!==j){
+//                var iVec = new THREE.Vector3();
+//                iVec.copy(nodes[i].sphere.position);
+//                var jVec = new THREE.Vector3();
+//                jVec.copy(nodes[j].sphere.position);
+//                if(jVec.distanceTo(iVec)<rThresh){
+//                    var forceVector = jVec.sub(iVec);
+//                    forceVector.normalize();
+//                    forceVector.multiplyScalar(rForce/nodes.length);
+//                    nodes[i].addForce(forceVector);
+//                    nodes[j].addForce(forceVector.multiplyScalar(-1));
+//                }
+//            }
+//        }
+//    }
+//}
+
+
 //------------------------------------------------------------
 
 void ofApp::addMoth(){
@@ -204,6 +273,9 @@ void ofApp::addMoth(){
     numMoths++;
     
 }
+
+
+
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){

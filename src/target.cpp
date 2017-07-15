@@ -23,10 +23,11 @@ void Target::draw(){
     
     
     ofTranslate(position.x, position.y, position.z);
-    ofRotateX(90);
+    //ofRotateX(90);
     //ofRotate(angle);
     //ofDrawCircle(0, 0, 0, 3);
-    ofDrawPlane(100, 100);
+    //ofDrawPlane(100, 100);
+    ofDrawBox(100, 20, 100);
     //ofDrawIcoSphere(0, 0, 0, r/2);
     //ofDraw
     //sphere.drawWireframe();

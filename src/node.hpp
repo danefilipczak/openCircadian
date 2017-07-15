@@ -33,6 +33,12 @@ public:
     void addForce(ofVec3f vec);
     void applyForce();
     void growMidpoint(Node neighbor);
+    void linkWith(Node neighbor);
+    
+    
+    const ofPoint& getPosition() const {
+        return position;
+    }
     
     
 private:

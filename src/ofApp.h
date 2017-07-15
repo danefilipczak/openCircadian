@@ -30,6 +30,10 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 		
     void addMoth();
+    void rejectAll(float rThresh, float rForce);
+    
+    
+    
     int numMoths = 0;
     
     ofImage tex;
