@@ -27,7 +27,7 @@ void ofApp::setup(){
     for (auto & n : nodes){
         for (auto & nn : nodes){
             if(n.getPosition() != nn.getPosition()){
-                if(n.getPosition().distance(nn.getPosition())<icoR*1.5){
+                if(n.getPosition().distance(nn.getPosition())<icoR*1.2){
                     nn.linkWith(n);
                 };
             };
@@ -150,6 +150,14 @@ void ofApp::update(){
     
     
     // NODE STUFF
+    //add forces
+    rejectAll(500, 1); //thresh, then force
+    
+    //commit forces. with springyness????
+    for(auto & n : nodes){
+        n.applyForce();
+    }
+    
     
     
     

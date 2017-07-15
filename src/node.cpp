@@ -9,6 +9,16 @@
 #include "node.hpp"
 
 
+void Node::addForce(ofVec3f force){
+    velocity += force;
+}
+
+void Node::applyForce(){
+    position += velocity;
+    velocity.set(0, 0, 0);
+    
+}
+
 void Node::setup(float x, float y, float z){
     position.set(x, y, z);
     r = 50;

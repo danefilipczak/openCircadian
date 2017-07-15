@@ -49,6 +49,7 @@ private:
     float r;
     ofMaterial material;
     ofVec3f position;
+    ofVec3f velocity;
     
 };
 
