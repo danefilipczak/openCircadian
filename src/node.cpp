@@ -23,6 +23,7 @@ void Node::draw(){
     ofPushMatrix();
     material.begin();
     
+    
     ofSetColor(0, 100);
     ofTranslate(position.x, position.y, position.z);
     //ofRotate(angle);

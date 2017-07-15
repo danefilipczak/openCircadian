@@ -32,12 +32,14 @@ class ofApp : public ofBaseApp{
     void addMoth();
     int numMoths = 0;
     
+    ofImage tex;
     
     ofEasyCam camera;
     ofMesh icosahedron;
     ofLight light;
     
     ofMaterial mothMaterial;
+    ofMaterial targetMaterial;
    
     vector<Moth> moths;
     vector<Target> targets;

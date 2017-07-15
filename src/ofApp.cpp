@@ -2,7 +2,8 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-
+    ofEnableAlphaBlending();
+    ofDisableArbTex();
     
     //OSC boilerplate
     receiver.setup(RECEIVE_PORT);
@@ -22,11 +23,18 @@ void ofApp::setup(){
     }
     
     
+    tex.loadImage("iceland.jpg");
+    //tex.allocate(<#const ofTextureData &textureData#>)
+    
     mothMaterial.setShininess(120);
     mothMaterial.setSpecularColor(ofColor(0));
     mothMaterial.setDiffuseColor(ofColor(200));
     mothMaterial.setAmbientColor(ofColor(100));
-//    
+//
+    targetMaterial.setShininess(120);
+    targetMaterial.setSpecularColor(ofColor(255, 100));
+    targetMaterial.setDiffuseColor(ofColor(200, 100));
+    targetMaterial.setAmbientColor(ofColor(100));
 //    
 //    Moth m;
 //    m.setup(numMoths, ofRandom(ofGetWidth()), ofRandom(ofGetHeight()), ofRandom(ofGetHeight()));
@@ -65,10 +73,10 @@ void ofApp::setup(){
     //
     //    }
     
-    
+    ofEnableDepthTest();
     
     for (auto t = targets.begin(); t != targets.end(); t++){
-        t->setup(ofVec3f(0, -100+(y*50), 0));
+        t->setup(ofVec3f(0, -500+(y*200), 0));
         y++;
     };
     
@@ -124,7 +132,7 @@ void ofApp::update(){
 void ofApp::draw(){
     
     //ofBackground(255, 255, 255);
-    ofBackground(10);
+    ofBackground(250);
     
     ofEnableDepthTest();
     
@@ -142,16 +150,28 @@ void ofApp::draw(){
         m.draw();
     }
     mothMaterial.end();
-    for (auto & t : targets){
-        t.draw();
-    }
+    
+    
+   
     for (auto & n : nodes){
         n.draw();
     }
     
     
-    
     light.disable();
+    //targetMaterial.begin();
+    tex.getTextureReference().bind();
+    ofSetColor(255, 255, 255, 150);
+    for (auto & t : targets){
+        t.draw();
+    };
+    tex.getTextureReference().unbind();
+    //targetMaterial.end();
+   
+    
+    
+    
+    
     camera.end();
     
 
@@ -175,10 +195,11 @@ void ofApp::keyPressed(int key){
 //------------------------------------------------------------
 
 void ofApp::addMoth(){
-    
+    float w = ofGetWidth();
+    float h = ofGetHeight();
 
     Moth m;
-     m.setup(numMoths, ofRandom(ofGetWidth()), ofRandom(ofGetHeight()), ofRandom(ofGetHeight()));
+     m.setup(numMoths, ofRandom(w)-(w/2), ofRandom(w)-(w/2), ofRandom(w)-(w/2));
     moths.push_back(m);
     numMoths++;
     

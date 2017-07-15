@@ -30,6 +30,7 @@ public:
     
 private:
     ofVec3f position;
+    //ofPlanePrimitive plane;
 };
 
 

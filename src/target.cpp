@@ -21,10 +21,12 @@ void Target::setPosition(ofVec3f pos){
 void Target::draw(){
     ofPushMatrix();
     
-    ofSetColor(255, 255, 0, 100);
+    
     ofTranslate(position.x, position.y, position.z);
+    ofRotateX(90);
     //ofRotate(angle);
-    ofDrawCircle(0, 0, 0, 3);
+    //ofDrawCircle(0, 0, 0, 3);
+    ofDrawPlane(100, 100);
     //ofDrawIcoSphere(0, 0, 0, r/2);
     //ofDraw
     //sphere.drawWireframe();
