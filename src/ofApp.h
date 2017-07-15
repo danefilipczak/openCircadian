@@ -4,6 +4,7 @@
 #include "moth.hpp"
 #include "target.hpp"
 #include "ofxOsc.h"
+#include "node.hpp"
 
 #define RECEIVE_PORT 12345
 #define SEND_PORT 54321
@@ -33,11 +34,14 @@ class ofApp : public ofBaseApp{
     
     
     ofEasyCam camera;
-    ofSpherePrimitive sphere;
+    ofMesh icosahedron;
     ofLight light;
+    
+    ofMaterial mothMaterial;
    
     vector<Moth> moths;
     vector<Target> targets;
+    vector<Node> nodes;
     
     ofxOscReceiver receiver;
     float partials[20]; //incoming info about where the targets should end up

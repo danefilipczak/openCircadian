@@ -4,20 +4,49 @@
 void ofApp::setup(){
 
     
-    
+    //OSC boilerplate
     receiver.setup(RECEIVE_PORT);
     sender.setup(HOST, SEND_PORT);
     ofSetFrameRate(60); //this supposedly will keep the OSC from bugging everything. Probably best to just keep the clock lower on SC however
-    sphere.setResolution(5);
-    //    light.setSpotlight();
+    
+    
+    //give yourself an icosahedron
+    icosahedron = ofMesh::icosahedron(100);
+    
+    vector<ofVec3f> verts = icosahedron.getVertices();
+    
+    for (auto & v : verts){
+        Node n;
+        n.setup(v.x, v.y, v.z);
+        nodes.push_back(n);
+    }
+    
+    
+    mothMaterial.setShininess(120);
+    mothMaterial.setSpecularColor(ofColor(0));
+    mothMaterial.setDiffuseColor(ofColor(200));
+    mothMaterial.setAmbientColor(ofColor(100));
+//    
+//    
+//    Moth m;
+//    m.setup(numMoths, ofRandom(ofGetWidth()), ofRandom(ofGetHeight()), ofRandom(ofGetHeight()));
+//    moths.push_back(m);
+//    
+//    //    light.setSpotlight();
+//    
+//    
+    
+    
+    //lights
     ofSetSmoothLighting(true);
-    light.setDiffuseColor( ofFloatColor(.85, .85, .55) );
+    light.setPosition(0, 1000, 1000);
+    light.setDiffuseColor( ofColor(255) );
     light.setSpecularColor( ofFloatColor(1.f, 1.f, 1.f));
     
     
     
-    moths.resize(500);
-    targets.resize(10);
+    //moths.resize(500);
+    targets.resize(20); //we want exactly ten targets... maybe?
     
     addMoth();
     
@@ -69,7 +98,7 @@ void ofApp::update(){
 
     
     //    sphere.move(ofVec3f(0,0,-10));
-    addMoth();
+    if(moths.size()<700){addMoth();};
     
     
     for (auto & m : moths){
@@ -94,7 +123,8 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     
-    ofBackground(255, 255, 255);
+    //ofBackground(255, 255, 255);
+    ofBackground(10);
     
     ofEnableDepthTest();
     
@@ -103,17 +133,20 @@ void ofApp::draw(){
     light.enable();
     
     // draw something
-    sphere.drawWireframe();
+    //icosahedron.drawWireframe();
     //    material.begin();
     //    sphere.draw();
     //    material.end();
-    
+    mothMaterial.begin();
     for (auto & m : moths){
         m.draw();
     }
-    
+    mothMaterial.end();
     for (auto & t : targets){
         t.draw();
+    }
+    for (auto & n : nodes){
+        n.draw();
     }
     
     

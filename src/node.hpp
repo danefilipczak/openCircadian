@@ -23,6 +23,8 @@
 class Node {
     
 public:
+    void setup(float x, float y, float z);
+    void draw();
     void age();
     void die();
     void makeLink(Node node);
@@ -38,6 +40,9 @@ private:
     vector<Node> linkedTo; //i'm not sure if this is going to work... needs to store a flexibly sized group of things that
     int lifespan;
     int deathClock;
+    float r;
+    ofMaterial material;
+    ofVec3f position;
     
 };
 
