@@ -19,6 +19,65 @@ void Node::applyForce(){
     
 }
 
+void Node::growMidpoint(Node* neighbor){
+    
+    
+    breakLink(neighbor);
+    neighbor->breakLink(this);
+    
+    ofVec3f halfway;
+    halfway.set(position);
+    halfway.interpolate(neighbor->getPosition(), 0.5);
+    
+    
+    //var overlap = intersect(this.linkedTo, neighbor.linkedTo);
+    //for(var k = 0;k<overlap.length; k++){
+    //    bud.makeLink(overlap[k]);
+    //    overlap[k].makeLink(bud);
+    //}
+    
+    
+    Node bud;
+    bud.setup(halfway.x, halfway.y, halfway.z);
+    bud.linkWith(this);
+    neighbor->linkWith(&bud);
+    linkWith(&bud);
+    
+    
+    
+    
+    
+}
+
+
+//var iVec = new THREE.Vector3();
+//iVec.copy(this.sphere.position);
+//var jVec = new THREE.Vector3();
+//jVec.copy(neighbor.sphere.position);
+//
+//
+//
+//
+//// var jNode = nodes[i].linkedTo[j];
+//// var iNode = nodes[i];
+//this.breakLink(neighbor);
+//neighbor.breakLink(this);
+//
+//var halfway = iVec.lerp(jVec, 0.5);
+//var bud = new Node(halfway);
+//
+//var overlap = intersect(this.linkedTo, neighbor.linkedTo);
+//for(var k = 0;k<overlap.length; k++){
+//    bud.makeLink(overlap[k]);
+//    overlap[k].makeLink(bud);
+//}
+//bud.makeLink(neighbor);
+//bud.makeLink(this)
+//neighbor.makeLink(bud);
+//this.makeLink(bud);
+//
+//nodes.push(bud);
+
 void Node::setup(float x, float y, float z){
     position.set(x, y, z);
     r = 50;

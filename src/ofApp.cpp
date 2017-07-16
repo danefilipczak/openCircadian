@@ -12,18 +12,13 @@ void ofApp::setup(){
     ofSetFrameRate(60); //this supposedly will keep the OSC from bugging everything. Probably best to just keep the clock lower on SC however
     
     float icoR = 100;
-    
-    //give yourself an icosahedron
     icosahedron = ofMesh::icosahedron(icoR);
-    
     vector<ofVec3f> verts = icosahedron.getVertices();
-    
     for (auto & v : verts){
         Node n;
         n.setup(v.x, v.y, v.z);
         nodes.push_back(n);
     }
-    
     for (auto & n : nodes){
         for (auto & nn : nodes){
             if(n.getPosition() != nn.getPosition()){
@@ -157,6 +152,7 @@ void ofApp::update(){
     for(auto & n : nodes){
         n.applyForce();
     }
+    //edgeSplit(200);
     
     
     
@@ -168,7 +164,7 @@ void ofApp::update(){
 void ofApp::draw(){
     
     //ofBackground(255, 255, 255);
-    ofBackground(10);
+    ofBackground(100, 100, 20);
     
     ofEnableDepthTest();
     
@@ -229,6 +225,33 @@ void ofApp::keyPressed(int key){
 
 }
 
+//-------------------------------------------------
+
+void ofApp::edgeSplit(float thresh){
+    for(auto & i : nodes){
+        ofVec3f ip = i.getPosition();
+        for(auto & j : nodes){
+            ofVec3f jp = j.getPosition();
+            if(ip.distance(jp)>thresh){
+                i.growMidpoint(&j);
+            }
+        }
+    }
+}
+
+
+//function edgeSplit(sThresh){
+//    for(var i=0; i<nodes.length;i++){
+//        for(var j=0; j<nodes[i].linkedTo.length;j++){
+//            if(nodes[i].sphere.position.distanceTo(nodes[i].linkedTo[j].sphere.position)>sThresh){
+//                
+//                nodes[i].growMidpoint(nodes[i].linkedTo[j]);
+//                
+//                
+//            }
+//        }
+//    }
+//}
 
 //-----------------------------------------------------
 

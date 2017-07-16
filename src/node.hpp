@@ -27,13 +27,14 @@ public:
     void draw();
     void age();
     void die();
-    void makeLink(Node node);
-    void breakLink(Node node);
+    //void makeLink(Node node);
+    void breakLink(Node* node);
     void breakAll();
     void addForce(ofVec3f vec);
     void applyForce();
-    void growMidpoint(Node neighbor);
-    void linkWith(Node* neighbor); //why did this not work when I tried to pass it a whole node object and post to it within the function, e.g. linkWith(Node neightbor);
+    //void growMidpoint(Node neighbor);
+    void linkWith(Node* neighbor); //why did this not work when I tried to pass it a whole node object and post to it within the function?
+    void growMidpoint(Node* neighbor);
     
     
     const ofPoint& getPosition() const {

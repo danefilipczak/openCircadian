@@ -31,6 +31,7 @@ class ofApp : public ofBaseApp{
 		
     void addMoth();
     void rejectAll(float rThresh, float rForce);
+    void edgeSplit(float thresh);
     
     
     
