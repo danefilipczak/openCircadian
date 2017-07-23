@@ -12,7 +12,8 @@
 //questions:
 /*
  
- wtf with the splitQueue < - also is using nested accelerated vector looping intellegent
+ Using a list for nodes and doing linkedTo off refrences. Is this intellegent? 
+ Would it be better to use map and a primary key? 
  
  
  
@@ -69,7 +70,7 @@ class ofApp : public ofBaseApp{
    
     vector<Moth> moths;
     vector<Target> targets;
-    vector<Node> nodes;
+    list<Node> nodes;
     
     
     ofxOscReceiver receiver;

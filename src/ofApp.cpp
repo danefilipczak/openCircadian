@@ -5,7 +5,7 @@ void ofApp::setup(){
     ofEnableAlphaBlending();
     //ofDisableArbTex();
     ofSetGlobalAmbientColor(ofColor(255));
-    nodes.reserve(1000); //a hack
+    //nodes.reserve(1000); //a hack
     
     stop = false;
     //OSC boilerplate
@@ -268,14 +268,14 @@ vector<Node*> intersection(vector<Node*> v1, vector<Node*> v2)
 
 
 void ofApp::edgeSplit(float thresh){
-    //for(auto & i : nodes){
+    for(auto & i : nodes){
     //it's really dumb to loop through a vector using iterators if you're also going to be adding to the vector during the loop... an index-based loop works better.
    
     int oldSize = nodes.size();
     //Node bud;
-    for(int i = 0; i<oldSize; i++){
+    //for(int i = 0; i<oldSize; i++){
        
-        vector<Node*> growth = nodes[i].getNeighborsFartherThan(thresh);
+        vector<Node*> growth = i.getNeighborsFartherThan(thresh);
         //Node* close = nodes[i].getANeighborFartherThan(thresh);
         
         if(growth.size()>0){
@@ -289,27 +289,27 @@ void ofApp::edgeSplit(float thresh){
             
             
             
-            Node bud = nodes[i].growMidpoint(j);
+            Node bud = i.growMidpoint(j);
             nodes.push_back(bud);
             
             //then, push it to its final resting place.
             
             Node* budRef = &nodes.back();
         
-            nodes[i].breakLink(j);
-            j->breakLink(&nodes[i]);
+            i.breakLink(j);
+            j->breakLink(&i);
         
-            vector<Node*> overlap = intersection(nodes[i].getLinkedTo(), j->getLinkedTo());
+            vector<Node*> overlap = intersection(i.getLinkedTo(), j->getLinkedTo());
             for(auto & k : overlap){
                 budRef->linkWith(k);
                 k->linkWith(budRef);
             }
 
-            budRef->linkWith(&nodes[i]);
+            budRef->linkWith(&i);
             budRef->linkWith(j);
             
             
-            nodes[i].linkWith(budRef);
+            i.linkWith(budRef);
             j->linkWith(budRef);
             
             
