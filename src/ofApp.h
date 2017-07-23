@@ -9,6 +9,17 @@
 #define RECEIVE_PORT 12345
 #define SEND_PORT 54321
 #define HOST "localhost"
+//questions:
+/*
+ 
+ wtf with the splitQueue < - also is using nested accelerated vector looping intellegent
+ 
+ 
+ 
+ 
+ */
+
+
 
 class ofApp : public ofBaseApp{
 
@@ -33,7 +44,17 @@ class ofApp : public ofBaseApp{
     void rejectAll(float rThresh, float rForce);
     void edgeSplit(float thresh);
     
-    
+//    
+//    struct nodePair {
+//        
+//        Node* a;
+//        Node* b;
+//        
+//    };
+//    
+//    vector<nodePair> splitQueue;
+//    
+//    vector<Node> nodeQueue;
     
     int numMoths = 0;
     
@@ -50,9 +71,11 @@ class ofApp : public ofBaseApp{
     vector<Target> targets;
     vector<Node> nodes;
     
+    
     ofxOscReceiver receiver;
     float partials[20]; //incoming info about where the targets should end up
     
+    bool stop;
     
     //for sending information about moths
     ofxOscSender sender;

@@ -7,6 +7,7 @@
 //
 
 #include "node.hpp"
+#include "ofApp.h"
 
 
 void Node::addForce(ofVec3f force){
@@ -19,29 +20,76 @@ void Node::applyForce(){
     
 }
 
-void Node::growMidpoint(Node* neighbor){
+void Node::breakLink(Node* node){
+
+    
+//    
+//    linkedTo.erase(remove(linkedTo.begin(), linkedTo.end(), node), linkedTo.end());
+    
+    int deathIndex;
+    
+    for(int i = 0; i < linkedTo.size(); i++){
+        if(linkedTo[i]==node){
+            deathIndex = i;
+        }
+    }
+    linkedTo.erase(linkedTo.begin()+deathIndex);
+    
+}
+
+
+Node* Node::getANeighborFartherThan(float thresh){
+    
+    for(auto & i : linkedTo){
+        
+        if(position.distance(i->getPosition())>thresh){
+            return i;
+            break;
+        }
+        
+    }
+    
+}
+
+vector<Node*> Node::getNeighborsFartherThan(float thresh){
+    vector<Node*> tooFar;
+    
+    for(auto & i : linkedTo){
+        
+        if(position.distance(i->getPosition())>thresh){
+            tooFar.push_back(i);
+        }
+        
+    }
     
     
-    breakLink(neighbor);
-    neighbor->breakLink(this);
+    return tooFar;
     
-    ofVec3f halfway;
-    halfway.set(position);
-    halfway.interpolate(neighbor->getPosition(), 0.5);
+}
+
+
+
+Node Node::growMidpoint(Node* neighbor){
     
     
-    //var overlap = intersect(this.linkedTo, neighbor.linkedTo);
-    //for(var k = 0;k<overlap.length; k++){
-    //    bud.makeLink(overlap[k]);
-    //    overlap[k].makeLink(bud);
-    //}
+    
+ 
+    
+    ofVec3f halfway(neighbor->getPosition());
+    halfway.interpolate(position, 0.5);
     
     
     Node bud;
     bud.setup(halfway.x, halfway.y, halfway.z);
-    bud.linkWith(this);
-    neighbor->linkWith(&bud);
-    linkWith(&bud);
+    
+//    neighbor->linkWith(&bud);
+//    linkWith(&bud);
+    
+    
+    return bud;
+
+    
+    //nodes.push_back(bud);
     
     
     

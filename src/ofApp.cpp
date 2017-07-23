@@ -5,7 +5,9 @@ void ofApp::setup(){
     ofEnableAlphaBlending();
     //ofDisableArbTex();
     ofSetGlobalAmbientColor(ofColor(255));
+    nodes.reserve(1000); //a hack
     
+    stop = false;
     //OSC boilerplate
     receiver.setup(RECEIVE_PORT);
     sender.setup(HOST, SEND_PORT);
@@ -14,9 +16,12 @@ void ofApp::setup(){
     float icoR = 100;
     icosahedron = ofMesh::icosahedron(icoR);
     vector<ofVec3f> verts = icosahedron.getVertices();
+    float skew = 5; //for making all the edges not split at once
     for (auto & v : verts){
         Node n;
-        n.setup(v.x, v.y, v.z);
+        n.setup(v.x+ofRandom(skew),
+                v.y+ofRandom(skew),
+                v.z+ofRandom(skew));
         nodes.push_back(n);
     }
     for (auto & n : nodes){
@@ -29,6 +34,8 @@ void ofApp::setup(){
         };
     };
     
+    
+    //edgeSplit(icoR);
 //    for (var i = 0; i < nodes.length; i++) {
 //        for (var j = 0; j < nodes.length; j++) {
 //            if(i!==j){
@@ -103,6 +110,7 @@ void ofApp::setup(){
     };
     
     
+    
     //    material.setDiffuseColor(ofFloatColor(.85, .85, .55));
     //    material.setShininess(0.01);
     
@@ -146,13 +154,21 @@ void ofApp::update(){
     
     // NODE STUFF
     //add forces
+    
+    
     rejectAll(500, 1); //thresh, then force
     
     //commit forces. with springyness????
     for(auto & n : nodes){
         n.applyForce();
     }
-    //edgeSplit(200);
+    
+    
+    if(!stop && nodes.size()<100){
+        //consistently breaks on 17. wtf.
+        edgeSplit(300);
+    }
+    
     
     
     
@@ -164,13 +180,14 @@ void ofApp::update(){
 void ofApp::draw(){
     
     //ofBackground(255, 255, 255);
-    ofBackground(100, 100, 20);
+    ofBackground(100, 100, 100);
     
     ofEnableDepthTest();
     
     ofEnableLighting();
     camera.begin();
     light.enable();
+    
     
     // draw something
     //icosahedron.drawWireframe();
@@ -206,12 +223,16 @@ void ofApp::draw(){
     
     camera.end();
     
+   
+    
 
 
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
+    
+    stop = true;
     
     float y = 0;
     for (auto & t : targets){
@@ -221,22 +242,93 @@ void ofApp::keyPressed(int key){
         
     }
     
-    moths.at(1);
+    //moths.at(1);
 
 }
 
 //-------------------------------------------------
 
+
+//helper function
+
+vector<Node*> intersection(vector<Node*> v1, vector<Node*> v2)
+{
+    
+    vector<Node*> v3;
+    
+    sort(v1.begin(), v1.end());
+    sort(v2.begin(), v2.end());
+    
+    set_intersection(v1.begin(),v1.end(),v2.begin(),v2.end(),back_inserter(v3));
+    
+    return v3;
+}
+
+
+
+
 void ofApp::edgeSplit(float thresh){
-    for(auto & i : nodes){
-        ofVec3f ip = i.getPosition();
-        for(auto & j : nodes){
-            ofVec3f jp = j.getPosition();
-            if(ip.distance(jp)>thresh){
-                i.growMidpoint(&j);
+    //for(auto & i : nodes){
+    //it's really dumb to loop through a vector using iterators if you're also going to be adding to the vector during the loop... an index-based loop works better.
+   
+    int oldSize = nodes.size();
+    //Node bud;
+    for(int i = 0; i<oldSize; i++){
+       
+        vector<Node*> growth = nodes[i].getNeighborsFartherThan(thresh);
+        //Node* close = nodes[i].getANeighborFartherThan(thresh);
+        
+        if(growth.size()>0){
+            
+            //cout << growth.size();
+            //for(auto & j : growth){
+            Node* j = growth[0];
+            
+                
+                //first, make a new node, during which we link it up to its parents
+            
+            
+            
+            Node bud = nodes[i].growMidpoint(j);
+            nodes.push_back(bud);
+            
+            //then, push it to its final resting place.
+            
+            Node* budRef = &nodes.back();
+        
+            nodes[i].breakLink(j);
+            j->breakLink(&nodes[i]);
+        
+            vector<Node*> overlap = intersection(nodes[i].getLinkedTo(), j->getLinkedTo());
+            for(auto & k : overlap){
+                budRef->linkWith(k);
+                k->linkWith(budRef);
             }
+
+            budRef->linkWith(&nodes[i]);
+            budRef->linkWith(j);
+            
+            
+            nodes[i].linkWith(budRef);
+            j->linkWith(budRef);
+            
+            
+            
+            
+                
+                
+            //}
+            
+            
+            //stop = true;//just for debugging
+            break; //stop looking through the nodes
         }
+        
+        
     }
+
+    
+    
 }
 
 

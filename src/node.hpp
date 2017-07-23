@@ -6,10 +6,10 @@
 //
 //
 
-
+#include "ofMain.h"
 #ifndef node_hpp
 #define node_hpp
-#include "ofMain.h"
+
 
 //this is how you can pop through vectors
 
@@ -27,18 +27,25 @@ public:
     void draw();
     void age();
     void die();
-    //void makeLink(Node node);
+    
+    vector<Node*> getNeighborsFartherThan(float thresh);
+    Node* getANeighborFartherThan(float thresh);
+    
     void breakLink(Node* node);
     void breakAll();
     void addForce(ofVec3f vec);
     void applyForce();
     //void growMidpoint(Node neighbor);
     void linkWith(Node* neighbor); //why did this not work when I tried to pass it a whole node object and post to it within the function?
-    void growMidpoint(Node* neighbor);
+    Node growMidpoint(Node* neighbor);
     
     
     const ofPoint& getPosition() const {
         return position;
+    }
+    
+    vector<Node*> getLinkedTo() {
+        return linkedTo;
     }
     
     
