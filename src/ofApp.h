@@ -14,6 +14,7 @@
  
  Using a list for nodes and doing linkedTo off refrences. Is this intellegent? 
  Would it be better to use map and a primary key? 
+ Lists are unordered and thus preclude an elegent way to limit iteration.
  
  
  
@@ -44,6 +45,7 @@ class ofApp : public ofBaseApp{
     void addMoth();
     void rejectAll(float rThresh, float rForce);
     void edgeSplit(float thresh);
+    void attractNeighbors(float aThresh, float aForce);
     
 //    
 //    struct nodePair {
@@ -56,6 +58,12 @@ class ofApp : public ofBaseApp{
 //    vector<nodePair> splitQueue;
 //    
 //    vector<Node> nodeQueue;
+    
+    struct birth {
+        Node child;
+        Node* father;
+        Node* mother;
+    };
     
     int numMoths = 0;
     

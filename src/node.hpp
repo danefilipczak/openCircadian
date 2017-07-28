@@ -35,8 +35,9 @@ public:
     void breakAll();
     void addForce(ofVec3f vec);
     void applyForce();
+    void drawPipe(ofVec3f);
     //void growMidpoint(Node neighbor);
-    void linkWith(Node* neighbor); //why did this not work when I tried to pass it a whole node object and post to it within the function?
+    void linkWith(Node* neighbor); 
     Node growMidpoint(Node* neighbor);
     
     
@@ -56,6 +57,8 @@ private:
     int deathClock;
     float r;
     ofMaterial material;
+    ofMaterial pipeMaterial;
+    
     ofVec3f position;
     ofVec3f velocity;
     

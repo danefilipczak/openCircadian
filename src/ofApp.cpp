@@ -34,22 +34,7 @@ void ofApp::setup(){
         };
     };
     
-    
-    //edgeSplit(icoR);
-//    for (var i = 0; i < nodes.length; i++) {
-//        for (var j = 0; j < nodes.length; j++) {
-//            if(i!==j){
-//                var iVec = new THREE.Vector3();
-//                iVec.copy(nodes[i].sphere.position);
-//                var jVec = new THREE.Vector3();
-//                jVec.copy(nodes[j].sphere.position);
-//                if(jVec.distanceTo(iVec)<geomThresh){
-//                    nodes[j].linkedTo.push(nodes[i]);
-//                    //nodes[i].linkedTo.push(nodes[j]);
-//                }
-//            }
-//        }
-//    }
+
     
     
     //tex.loadImage("iceland.jpg");
@@ -79,6 +64,7 @@ void ofApp::setup(){
     light.setPosition(0, 1000, 1000);
     light.setDiffuseColor( ofColor(255) );
     light.setSpecularColor( ofFloatColor(1.f, 1.f, 1.f));
+    camera.setFarClip(100000000);
     
     
     
@@ -155,8 +141,12 @@ void ofApp::update(){
     // NODE STUFF
     //add forces
     
+    float r = ofNoise(ofGetElapsedTimef())*1;
+    float a = ofNoise(ofGetElapsedTimef()+1000)*0.5;
     
-    rejectAll(500, 1); //thresh, then force
+    
+    rejectAll(300, r); //thresh, then force
+    //attractNeighbors(100, -a);
     
     //commit forces. with springyness????
     for(auto & n : nodes){
@@ -164,14 +154,14 @@ void ofApp::update(){
     }
     
     
-    if(!stop && nodes.size()<100){
+    if(!stop && nodes.size()<50){
         //consistently breaks on 17. wtf.
-        edgeSplit(300);
+        edgeSplit(170);
     }
     
     
     
-    
+    //ofSaveScreen(ofToString(ofGetFrameNum())+".png");
     
     
 }
@@ -196,7 +186,7 @@ void ofApp::draw(){
     //    material.end();
     mothMaterial.begin();
     for (auto & m : moths){
-        m.draw();
+        //m.draw();
     }
     mothMaterial.end();
     
@@ -208,11 +198,11 @@ void ofApp::draw(){
     
     
     light.disable();
-    //targetMaterial.begin();
+    //targeftMaterial.begin();
     //tex.getTextureReference().bind();
     ofSetColor(255, 255, 50, 100);
     for (auto & t : targets){
-        t.draw();
+        //t.draw();
     };
     //tex.getTextureReference().unbind();
     //targetMaterial.end();
@@ -268,62 +258,66 @@ vector<Node*> intersection(vector<Node*> v1, vector<Node*> v2)
 
 
 void ofApp::edgeSplit(float thresh){
+    vector <birth> stage;
+    stage.clear();
     for(auto & i : nodes){
-    //it's really dumb to loop through a vector using iterators if you're also going to be adding to the vector during the loop... an index-based loop works better.
-   
-    int oldSize = nodes.size();
-    //Node bud;
-    //for(int i = 0; i<oldSize; i++){
-       
-        vector<Node*> growth = i.getNeighborsFartherThan(thresh);
-        //Node* close = nodes[i].getANeighborFartherThan(thresh);
-        
-        if(growth.size()>0){
-            
-            //cout << growth.size();
-            //for(auto & j : growth){
-            Node* j = growth[0];
-            
-                
-                //first, make a new node, during which we link it up to its parents
-            
-            
-            
-            Node bud = i.growMidpoint(j);
-            nodes.push_back(bud);
-            
-            //then, push it to its final resting place.
-            
-            Node* budRef = &nodes.back();
-        
-            i.breakLink(j);
-            j->breakLink(&i);
-        
-            vector<Node*> overlap = intersection(i.getLinkedTo(), j->getLinkedTo());
-            for(auto & k : overlap){
-                budRef->linkWith(k);
-                k->linkWith(budRef);
-            }
+        //Node* j;
+    
 
-            budRef->linkWith(&i);
-            budRef->linkWith(j);
+       
+        //vector<Node*> growth = i.getNeighborsFartherThan(thresh);
+        Node* close = i.getANeighborFartherThan(thresh);
+        if(close != &i){ //if a neighbor over the threshold has been found
+            
+            Node * j = i.getANeighborFartherThan(thresh);
+            cout << j;
+            i.breakLink(&*j);
             
             
-            i.linkWith(budRef);
-            j->linkWith(budRef);
+            j->breakLink(&i);
+
             
-            
-            
-            
-                
-                
-            //}
-            
-            
-            //stop = true;//just for debugging
-            break; //stop looking through the nodes
+            birth babe;
+            babe.mother = &i;
+            babe.father = j;
+            stage.push_back(babe);
         }
         
+    };
+    
+    //stop = true;
+    
+    for(auto & b : stage){
+        
+        //nodes.push_back(b.child);
+        
+        Node babe = b.mother->growMidpoint(b.father);
+        nodes.push_back(babe);
+        
+        Node* budPtr= &nodes.back();
+////
+        //b.father->linkWith(b.mother);
+                //b.mother->getPosition();
+
+        //ofVec3f love = b.father->getPosition();
+        
+        
+        vector<Node*> overlap = intersection(b.mother->getLinkedTo(), b.father->getLinkedTo());
+        
+        for(auto & k : overlap){
+            budPtr->linkWith(k);
+            k->linkWith(budPtr);
+        }
+
+        budPtr->linkWith(b.mother);
+        budPtr->linkWith(b.father);
+        
+        
+        b.mother->linkWith(budPtr);
+        b.father->linkWith(budPtr);
+        
+        
+
         
     }
 
@@ -357,8 +351,27 @@ void ofApp::rejectAll(float rThresh, float rForce){
                 if(ip.distance(jp)<rThresh){
                     ofVec3f force = ip - jp;
                     force.normalize();
-                    i.addForce(force *= rForce/nodes.size());
-                    j.addForce(-force *= rForce/nodes.size());
+                    i.addForce(force *= rForce);
+                    j.addForce(-force *= rForce);
+                };
+            };
+        };
+    };
+};
+
+
+void ofApp::attractNeighbors(float aThresh, float aForce){
+    for(auto & i : nodes){
+        ofVec3f ip = i.getPosition();
+        vector<Node*> neighbors = i.getLinkedTo();
+        for(auto & j : neighbors){
+            ofVec3f jp = j->getPosition();
+            if(ip != jp){
+                if(ip.distance(jp)>aThresh){
+                    ofVec3f force = ip - jp;
+                    force.normalize();
+                    i.addForce(force *= aForce);
+                    j->addForce(-force *= aForce);
                 };
             };
         };

@@ -23,17 +23,31 @@ void Node::applyForce(){
 void Node::breakLink(Node* node){
 
     
-//    
+    
 //    linkedTo.erase(remove(linkedTo.begin(), linkedTo.end(), node), linkedTo.end());
     
     int deathIndex;
+    bool found = false;
     
     for(int i = 0; i < linkedTo.size(); i++){
         if(linkedTo[i]==node){
             deathIndex = i;
+            found = true;
+            
         }
     }
-    linkedTo.erase(linkedTo.begin()+deathIndex);
+    if (!found){
+        cout << "didn't find it";
+    }
+    linkedTo.erase(linkedTo.begin()+(deathIndex));
+    
+//    for (auto it = linkedTo.begin(); it != linkedTo.end();){ // No ++ here
+//        if ((*it) == node) {
+//            it = linkedTo.erase(it);
+//        } else {
+//            ++it;
+//        }
+//    }
     
 }
 
@@ -44,10 +58,11 @@ Node* Node::getANeighborFartherThan(float thresh){
         
         if(position.distance(i->getPosition())>thresh){
             return i;
-            break;
         }
         
     }
+    
+    return this;
     
 }
 
@@ -132,8 +147,13 @@ void Node::setup(float x, float y, float z){
     
     material.setShininess(120);
     material.setSpecularColor(ofColor(0));
-    material.setDiffuseColor(ofColor(200));
+    material.setDiffuseColor(ofColor(200, 90, 70));
     material.setAmbientColor(ofColor(0));
+    
+    pipeMaterial.setShininess(120);
+    pipeMaterial.setSpecularColor(ofColor(0));
+    pipeMaterial.setDiffuseColor(ofColor(200));
+    pipeMaterial.setAmbientColor(ofColor(0));
 }
 
 void Node::linkWith(Node* node){
@@ -155,16 +175,40 @@ void Node::draw(){
     material.end();
     ofPopMatrix();
     
-    ofSetLineWidth(10);
-    ofSetColor(255, 255, 70, 100);
+    pipeMaterial.begin();
+    
+    ofSetLineWidth(5);
+    //ofSetColor(255, 255, 70);
     for(auto & n : linkedTo){
-        //ofVec3f l = n->getPosition();
-        //cout << l;
-        //ofDrawLine(position.x, position.y, position.z, l.x, l.y, l.z);
-        ofDrawLine(position, n->getPosition());
-        //cout << n->getPosition();
+        
+        
+        //float angle = n->getPosition().angle(position);
+        ofVec3f nv = n->getPosition();
+        
+        
+        //a rad pipe
+        //drawPipe(nv);
+        
+        
+        ofDrawLine(position, nv);
+        
         
     };
+    pipeMaterial.end();
     
 
+}
+
+void Node::drawPipe(ofVec3f nv){
+    
+    
+            ofVec3f halfway = position.getInterpolated(nv, 0.5);
+            ofCylinderPrimitive pipe;
+            pipe.set(10, position.distance(nv));
+            pipe.setPosition(halfway);
+            pipe.lookAt(nv);
+            pipe.tilt(90);
+            pipe.setResolution(6, 2);
+            pipe.draw();
+    
 }
