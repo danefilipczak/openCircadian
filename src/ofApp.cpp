@@ -141,8 +141,8 @@ void ofApp::update(){
     // NODE STUFF
     //add forces
     
-    float r = ofNoise(ofGetElapsedTimef())*1;
-    float a = ofNoise(ofGetElapsedTimef()+1000)*0.5;
+    float r = ofNoise(ofGetElapsedTimef())*0.1;
+    float a = ofNoise(ofGetElapsedTimef()+1000)*0.3;
     
     
     rejectAll(300, r); //thresh, then force
@@ -154,7 +154,7 @@ void ofApp::update(){
     }
     
     
-    if(!stop && nodes.size()<50){
+    if(!stop && nodes.size()<200){
         //consistently breaks on 17. wtf.
         edgeSplit(170);
     }
@@ -170,7 +170,7 @@ void ofApp::update(){
 void ofApp::draw(){
     
     //ofBackground(255, 255, 255);
-    ofBackground(100, 100, 100);
+    ofBackground(10);
     
     ofEnableDepthTest();
     
@@ -178,45 +178,25 @@ void ofApp::draw(){
     camera.begin();
     light.enable();
     
-    
-    // draw something
-    //icosahedron.drawWireframe();
-    //    material.begin();
-    //    sphere.draw();
-    //    material.end();
     mothMaterial.begin();
     for (auto & m : moths){
-        //m.draw();
+        m.draw();
     }
     mothMaterial.end();
     
-    
-   
     for (auto & n : nodes){
         n.draw();
     }
     
     
     light.disable();
-    //targeftMaterial.begin();
-    //tex.getTextureReference().bind();
+    
     ofSetColor(255, 255, 50, 100);
     for (auto & t : targets){
-        //t.draw();
+        t.draw();
     };
-    //tex.getTextureReference().unbind();
-    //targetMaterial.end();
-   
-    
-    
-    
     
     camera.end();
-    
-   
-    
-
-
 }
 
 //--------------------------------------------------------------
@@ -243,6 +223,9 @@ void ofApp::keyPressed(int key){
 
 vector<Node*> intersection(vector<Node*> v1, vector<Node*> v2)
 {
+    /*
+     return the intersection of two vectors
+     */
     
     vector<Node*> v3;
     
@@ -258,86 +241,62 @@ vector<Node*> intersection(vector<Node*> v1, vector<Node*> v2)
 
 
 void ofApp::edgeSplit(float thresh){
+    
+    /*
+     
+     loop through all the nodes and see if any neighbors are over the split threshold
+     if they are, first break up the parents and then add their info to a staging vector. 
+     then, loop through the staging vector and insert new nodes between all the parents.
+     */
+    
     vector <birth> stage;
     stage.clear();
     for(auto & i : nodes){
-        //Node* j;
-    
-
        
-        //vector<Node*> growth = i.getNeighborsFartherThan(thresh);
+        //this function returns 'this' if no offending neighbor is found
         Node* close = i.getANeighborFartherThan(thresh);
         if(close != &i){ //if a neighbor over the threshold has been found
             
-            Node * j = i.getANeighborFartherThan(thresh);
-            cout << j;
-            i.breakLink(&*j);
+            vector<Node*> growth = i.getNeighborsFartherThan(thresh);
             
-            
-            j->breakLink(&i);
-
-            
-            birth babe;
-            babe.mother = &i;
-            babe.father = j;
-            stage.push_back(babe);
+            for(auto & g : growth){
+                i.breakLink(g);
+                g->breakLink(&i);
+                birth babe;
+                babe.mother = &i;
+                babe.father = g;
+                stage.push_back(babe);
+            }
         }
         
     };
     
-    //stop = true;
     
     for(auto & b : stage){
         
-        //nodes.push_back(b.child);
-        
+        //initialize a new Node halfway between the parents.
         Node babe = b.mother->growMidpoint(b.father);
+        //add it to the list and grab a pointer to it
         nodes.push_back(babe);
-        
         Node* budPtr= &nodes.back();
-////
-        //b.father->linkWith(b.mother);
-                //b.mother->getPosition();
-
-        //ofVec3f love = b.father->getPosition();
         
-        
+        //get the intersection of its parents' neighbors
         vector<Node*> overlap = intersection(b.mother->getLinkedTo(), b.father->getLinkedTo());
         
+        //link the babe up to the intersection
         for(auto & k : overlap){
             budPtr->linkWith(k);
             k->linkWith(budPtr);
         }
-
+        
+        //establish familial bonds
         budPtr->linkWith(b.mother);
         budPtr->linkWith(b.father);
-        
-        
         b.mother->linkWith(budPtr);
         b.father->linkWith(budPtr);
-        
-        
-
-        
     }
-
-    
-    
 }
 
-
-//function edgeSplit(sThresh){
-//    for(var i=0; i<nodes.length;i++){
-//        for(var j=0; j<nodes[i].linkedTo.length;j++){
-//            if(nodes[i].sphere.position.distanceTo(nodes[i].linkedTo[j].sphere.position)>sThresh){
-//                
-//                nodes[i].growMidpoint(nodes[i].linkedTo[j]);
-//                
-//                
-//            }
-//        }
-//    }
-//}
 
 //-----------------------------------------------------
 
@@ -378,25 +337,7 @@ void ofApp::attractNeighbors(float aThresh, float aForce){
     };
 };
 
-//function rejectAll(rThresh, rForce){
-//    for (var i = 0; i < nodes.length-1; i++) {
-//        for (var j = i+1; j < nodes.length; j++) {
-//            if(i!==j){
-//                var iVec = new THREE.Vector3();
-//                iVec.copy(nodes[i].sphere.position);
-//                var jVec = new THREE.Vector3();
-//                jVec.copy(nodes[j].sphere.position);
-//                if(jVec.distanceTo(iVec)<rThresh){
-//                    var forceVector = jVec.sub(iVec);
-//                    forceVector.normalize();
-//                    forceVector.multiplyScalar(rForce/nodes.length);
-//                    nodes[i].addForce(forceVector);
-//                    nodes[j].addForce(forceVector.multiplyScalar(-1));
-//                }
-//            }
-//        }
-//    }
-//}
+
 
 
 //------------------------------------------------------------
